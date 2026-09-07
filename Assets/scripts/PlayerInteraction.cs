@@ -7,6 +7,9 @@ public class PlayerInteraction : MonoBehaviour
 
     [Header("Combat")]
     [SerializeField] private bool canStartCombat = true;
+    public int attackBonus = 5;
+    public string damageNotation = "1d6+2";
+    public int armorClass = 13;
 
     private CombatAnimator combatAnimator;
 
@@ -34,6 +37,21 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
+    private void OnTriggerExit(Collider other)
+    {
+        EntityType otherEntity = other.GetComponentInParent<EntityType>();
+
+        if (otherEntity == null || otherEntity.entityType != EntityType.Type.Enemy)
+            return;
+
+        EnemyInteraction enemy = otherEntity.GetComponentInParent<EnemyInteraction>();
+
+        if (enemy != null && CombatManager.Instance != null)
+        {
+            CombatManager.Instance.ClearEncounter(enemy);
+        }
+    }
+
     private void InteractWithPlayer(EntityType otherPlayer)
     {
         if (!canInteract)
@@ -50,31 +68,34 @@ public class PlayerInteraction : MonoBehaviour
         if (!canStartCombat)
             return;
 
-        Debug.Log($"{name} comienza combate con {enemyEntity.name}");
-
-        // 1. El jugador ataca
-        if (combatAnimator != null)
-        {
-            combatAnimator.PlayAttack();
-        }
-
-        // 2. Buscamos el sistema de interacción del enemigo
         EnemyInteraction enemy =
             enemyEntity.GetComponentInParent<EnemyInteraction>();
 
-        if (enemy != null)
-        {
-            enemy.ReceiveAttack(this);
-        }
-        else
+        if (enemy == null)
         {
             Debug.LogWarning(
                 $"No se encontró EnemyInteraction en {enemyEntity.name}"
             );
+            return;
         }
 
-        // TODO:
-        // Aquí posteriormente se conectará CombatManager.
+        Debug.Log($"{name} está en rango de combate con {enemy.name}");
+
+        // El combate ya no se resuelve aquí: solo avisamos al CombatManager
+        // de que hay un encuentro activo. El preview y la tirada real
+        // se disparan desde AttackController (botón Atacar).
+        if (CombatManager.Instance != null)
+        {
+            CombatManager.Instance.RegisterEncounter(this, enemy);
+        }
+        else
+        {
+            Debug.LogWarning("No hay un CombatManager en la escena");
+        }
+    }
+
+    public CombatAnimator GetCombatAnimator()
+    {
+        return combatAnimator;
     }
 }
-

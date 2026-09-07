@@ -5,6 +5,11 @@ public class EnemyInteraction : MonoBehaviour
     [Header("Enemy")]
     [SerializeField] private bool canRespond = true;
 
+    [Header("Combate (usado por CombatManager / AttackController)")]
+    public int armorClass = 14;
+    public int maxHP = 20;
+    public int currentHP;
+
     private CombatAnimator combatAnimator;
 
     private PlayerInteraction currentPlayer;
@@ -12,6 +17,7 @@ public class EnemyInteraction : MonoBehaviour
     private void Awake()
     {
         combatAnimator = GetComponent<CombatAnimator>();
+        currentHP = maxHP;
     }
 
     public void ReceiveAttack(PlayerInteraction player)
@@ -52,18 +58,32 @@ public class EnemyInteraction : MonoBehaviour
         }
 
         // TODO:
-        // Aquí posteriormente se conectará el sistema de combate.
+        // Aquí posteriormente se conectará el contraataque del enemigo (su propia tirada).
         // No hay daño todavía.
     }
 
-    public void ReceiveDamage(float damage)
+    public void ReceiveDamage(int damage)
     {
-        // TODO:
-        // Sistema de combate.
+        if (currentHP <= 0)
+            return;
+
+        currentHP = Mathf.Max(0, currentHP - damage);
+        Debug.Log($"{name} recibió {damage} de daño ({currentHP}/{maxHP} HP)");
+
+        if (currentHP <= 0)
+        {
+            Die();
+        }
+        else if (combatAnimator != null)
+        {
+            combatAnimator.PlayHit();
+        }
     }
 
     public void Die()
     {
+        canRespond = false;
+
         if (combatAnimator != null)
         {
             combatAnimator.PlayDeath();
