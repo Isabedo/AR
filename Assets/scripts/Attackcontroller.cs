@@ -2,6 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace DnDAR.Combat
 {
@@ -122,9 +123,9 @@ namespace DnDAR.Combat
         public Button attackButton;
         public Button confirmButton;
         public GameObject previewPanel;
-        public Text hitChanceLabel;
-        public Text damageRangeLabel;
-        public Text resultLabel;
+        public TMP_Text hitChanceLabel;
+        public TMP_Text damageRangeLabel;
+        public TMP_Text resultLabel;
 
         private void Awake()
         {
