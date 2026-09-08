@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyInteraction : MonoBehaviour
 {
@@ -10,6 +11,9 @@ public class EnemyInteraction : MonoBehaviour
     public int maxHP = 20;
     public int currentHP;
 
+    [Header("UI de vida (opcional)")]
+    public Slider healthBarSlider;
+
     private CombatAnimator combatAnimator;
 
     private PlayerInteraction currentPlayer;
@@ -18,6 +22,7 @@ public class EnemyInteraction : MonoBehaviour
     {
         combatAnimator = GetComponent<CombatAnimator>();
         currentHP = maxHP;
+        UpdateHealthBar();
     }
 
     public void ReceiveAttack(PlayerInteraction player)
@@ -70,6 +75,8 @@ public class EnemyInteraction : MonoBehaviour
         currentHP = Mathf.Max(0, currentHP - damage);
         Debug.Log($"{name} recibió {damage} de daño ({currentHP}/{maxHP} HP)");
 
+        UpdateHealthBar();
+
         if (currentHP <= 0)
         {
             Die();
@@ -78,6 +85,12 @@ public class EnemyInteraction : MonoBehaviour
         {
             combatAnimator.PlayHit();
         }
+    }
+
+    private void UpdateHealthBar()
+    {
+        if (healthBarSlider != null)
+            healthBarSlider.value = maxHP > 0 ? (float)currentHP / maxHP : 0f;
     }
 
     public void Die()
