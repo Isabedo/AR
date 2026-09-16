@@ -11,7 +11,7 @@ public class EnemyInteraction : MonoBehaviour
     public int maxHP = 20;
     public int currentHP;
 
-    [Header("UI de vida (opcional)")]
+    [Header("UI de vida")]
     public Slider healthBarSlider;
 
     private CombatAnimator combatAnimator;
